@@ -148,7 +148,6 @@ void removeEvenValues(Stack *s)
   while (s->ll.head != NULL)
 	{
     int val = pop(s);
-    pop(s);
     if (val%2 != 0)
     {
       push(&p,val);
@@ -157,7 +156,6 @@ void removeEvenValues(Stack *s)
   while (p.ll.head != NULL)
 	{
     int val2 = pop(&p);
-    pop(&p);
     push(s,val2);
   }
 }
