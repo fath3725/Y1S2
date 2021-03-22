@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-           
 
 #define SIZE 80 //The size of the array
 
@@ -52,51 +51,58 @@ int main()
 
 
 void expressionLL(char* infix, LinkedList *inExpLL)
-{
-  LinkedList store;
-  store.head = NULL;
-  store.size = 0;
-  int p = strlen(infix); 
-  while( p != 0)
-  { // iterate over string   
-    int x = abs(atoi(infix));
-    if (x != 0)// if operand
+{ 
+    if (infix[0] == '\0')  // if null
     {
-      insertNode(&store, x , OPERAND); 
-      while ( x != 0) // for no of digits in X
-      {
-        x = x/10;
-        for (int i = 0; i <= p; i++) // remove index from string
+        return;
+    }
+    // reverse string
+    int len = strlen(infix) -1 ;
+    int k = len;
+    for(int i = 0; i < len; i++)
+    {
+        char temp = infix[k];
+        infix[k] = infix[i];
+        infix[i] = temp;
+        k--;
+        if(k == (len / 2))
         {
-          infix[i] = infix[i + 1];
+            break;
         }
-      } 
     }
-    char temp = infix[0];
-    if ((temp == '*') || ( temp == '/') || ( temp == '+')  || ( temp == '-') || ( temp == '(') || ( temp == ')') ) // if operator
-    {
-      insertNode(&store, temp, OPT);
-      for (int i = 0; i <= p; i++) // remove from string
-      {
-        infix[i] = infix[i + 1];
-      }
-    }
-  }
-
-  while (isEmptyLinkedList(store) != 1)
-  {
-    if (store.head->type == OPERAND){
-      int x = deleteNode(&store);
-      insertNode(inExpLL, x,OPERAND);
-    }
-    else{
-      int x = deleteNode(&store);
-      insertNode(inExpLL, x,OPT);
-    } 
-  }
+    while(1)
+    { // iterate over string
+        int x = abs(atoi(infix));
+        if (x != 0)// if operand
+        {
+            int y = 0;
+            while ( x != 0) // for no of digits in X
+            {   
+                int remainder = x % 10; // reverse number
+                y = y * 10 + remainder;
+                x /= 10;
+                for (int i = 0; i <= strlen(infix); i++) // remove index from string
+                {
+                    infix[i] = infix[i + 1];
+                }
+            }
+            insertNode(inExpLL, y , OPERAND);
+        }
+        char temp = infix[0];
+        if ((temp == '*') || ( temp == '/') || ( temp == '+')  || ( temp == '-') || ( temp == '(') || ( temp == ')') ) // if operator
+        {
+            insertNode(inExpLL, temp, OPT);
+            for (int i = 0; i <= strlen(infix); i++) // remove from string
+            {
+                infix[i] = infix[i + 1];
+            }
+        }
+        if (strlen(infix) == 0)
+        {
+            break;
+        }
+  }  
 }
-
-
 
 void printExpLL(LinkedList inExpLL, int seed)
 {
