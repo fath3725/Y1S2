@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define SIZE 80 //The size of the array
 
@@ -52,14 +53,11 @@ int main()
 
 void expressionLL(char* infix, LinkedList *inExpLL)
 { 
-    if (infix[0] == '\0')  // if null
-    {
-        return;
-    }
-    // reverse string
-    int len = strlen(infix) -1 ;
+    if (infix[0] == '\0') return;
+
+    int len = strlen(infix);// reverse string
     int k = len;
-    for(int i = 0; i < len; i++)
+    for(int i = 0; i < len; i++) 
     {
         char temp = infix[k];
         infix[k] = infix[i];
@@ -69,39 +67,35 @@ void expressionLL(char* infix, LinkedList *inExpLL)
         {
             break;
         }
-    }
-    while(1)
-    { // iterate over string
-        int x = abs(atoi(infix));
-        if (x != 0)// if operand
-        {
-            int y = 0;
-            while ( x != 0) // for no of digits in X
-            {   
-                int remainder = x % 10; // reverse number
-                y = y * 10 + remainder;
-                x /= 10;
-                for (int i = 0; i <= strlen(infix); i++) // remove index from string
-                {
-                    infix[i] = infix[i + 1];
-                }
-            }
-            insertNode(inExpLL, y , OPERAND);
-        }
-        char temp = infix[0];
-        if ((temp == '*') || ( temp == '/') || ( temp == '+')  || ( temp == '-') || ( temp == '(') || ( temp == ')') ) // if operator
-        {
-            insertNode(inExpLL, temp, OPT);
-            for (int i = 0; i <= strlen(infix); i++) // remove from string
+    } // string reversed WORKS GOOD
+    
+    for(int i = 0; i <= len;)
+    {
+        if (isdigit(infix[i]) != 0)// if DIGIT
+        { 
+            int store = 0;
+            int multiplier = 1;
+            int j = i;
+            while (isdigit(infix[j]) != 0)
             {
-                infix[i] = infix[i + 1];
+                int temp = infix[j]; //in ascii form
+                temp = temp-'0';// convert from ascii to int
+                store = store+multiplier*temp; // reverse order of numbers
+                j++;
+                multiplier *= 10;
+                i++;
             }
+            insertNode(inExpLL, store, OPERAND);
         }
-        if (strlen(infix) == 0)
-        {
-            break;
+        else if (infix[i] == " " || infix[i] == "\n" || infix[i] == '\t' || infix[i] == '\r' || infix[i] == '\x0b'){ //whitespace charas
+            i++;
         }
-  }  
+        else //if NOT digit
+        {  
+            insertNode(inExpLL, infix[i], OPT);
+            i++;            
+        }
+    }  
 }
 
 void printExpLL(LinkedList inExpLL, int seed)
