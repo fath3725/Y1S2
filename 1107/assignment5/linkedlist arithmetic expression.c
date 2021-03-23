@@ -69,7 +69,7 @@ void expressionLL(char* infix, LinkedList *inExpLL)
         }
     } // string reversed WORKS GOOD
     
-    for(int i = 0; i <= len;)
+    for(int i = 1; i <= len;)
     {
         if (isdigit(infix[i]) != 0)// if DIGIT
         { 
