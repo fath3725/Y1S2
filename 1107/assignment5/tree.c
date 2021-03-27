@@ -69,32 +69,30 @@ void createExpTree(BTNode** root,char* prefix)
 
     for ( int j = k; j != -1; j--)//traverse from back instead of reversing string faster
     {
-     if (prefix[j] == ' ') continue; // if whitespace ignore
+     if (prefix[j] == ' ' || prefix[j] == '\0') continue; // if whitespace or end string ignore. Start from '\0' therefore need this condition too
 
      if(isdigit(prefix[j])){
       store = store + multiplier*(prefix[j] - '0'); 
       multiplier *=10;      
      } 
-     else{
-        BTNode *newnode = malloc(sizeof(BTNode));
-        newnode->left = NULL; newnode->right = NULL;  // initialise nodes
-        if (store != 0){ //if digit
-         newnode->item= store;
-         push(p,newnode);
+     else{ //At this point, you will be potentially dealing with 2 nodes, 1 operand, 1 operator
+        if (store != 0){ //if digit before reaching here
+	 BTNode *operandnode = malloc(sizeof(BTNode)); //Create a node for OPERAND itself
+         operandnode->left = NULL; operandnode->right = NULL;  // initialise nodes
+         operandnode->item= store;
+         push(p,operandnode);
         }
-        else // if operator
-        {
-          newnode->item = prefix[j];
-          newnode->left = peek(*p);
+	//Definitely will be dealing with operator, removed else
+	  BTNode *operatornode = malloc(sizeof(BTNode)); //Create a node for OPERAND itself
+          operatornode->item = prefix[j];
+          operatornode->left = peek(*p);
           pop(p);
-          newnode->right = peek(*p);
+          operatornode->right = peek(*p);
           pop(p);
-          push(p, newnode);
-        }
-        *root = peek(*p);
+          push(p, operatornode);
      }
     }
-
+	*root = peek(*p); //Point to top of stack after finishing for loop
 }
 
 void printTree(BTNode *node){
