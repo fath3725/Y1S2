@@ -57,95 +57,123 @@ int main()
 
 void createExpTree(BTNode** root,char* prefix)
 {
- //Write your code here
- //insert each operatore as an internal node and operand as a leaf node
-    Stack *p;// stack
-    p->head = 0;
-    p->size = 0;
-
-    int multiplier = 1;
-    int store = 0; // store value of digits
-    int k = strlen(prefix);
-
-    for ( int j = k; j != -1; j--)//traverse from back instead of reversing string faster
+ //Write y
+      
+    //insert each operatore as an internal node and operand as a leaf node
+    Stack s;
+    s.head = NULL;
+    s.size = 0;
+    BTNode *node, *node_left, *node_right;
+    
+    int len = strlen(prefix);// reverse string
+    int k = len;
+    for(int i = 0; i < len; i++) 
     {
-     if (prefix[j] == ' ' || prefix[j] == '\0') continue; // if whitespace or end string ignore. Start from '\0' therefore need this condition too
-
-     if(isdigit(prefix[j])){
-      store = store + multiplier*(prefix[j] - '0'); 
-      multiplier *=10;      
-     } 
-     else{ //At this point, you will be potentially dealing with 2 nodes, 1 operand, 1 operator
-        if (store != 0){ //if digit before reaching here
-	 BTNode *operandnode = malloc(sizeof(BTNode)); //Create a node for OPERAND itself
-         operandnode->left = NULL; operandnode->right = NULL;  // initialise nodes
-         operandnode->item= store;
-         push(p,operandnode);
+        char temp = prefix[k];
+        prefix[k] = prefix[i];
+        prefix[i] = temp;
+        k--;
+        if(k == (len / 2))
+        {
+            break;
         }
-	//Definitely will be dealing with operator, removed else
-	  BTNode *operatornode = malloc(sizeof(BTNode)); //Create a node for OPERAND itself
-          operatornode->item = prefix[j];
-          operatornode->left = peek(*p);
-          pop(p);
-          operatornode->right = peek(*p);
-          pop(p);
-          push(p, operatornode);
-     }
+    } // string reversed WORKS GOOD
+    int store = 0;
+    int multiplier = 1;
+
+    for (int i=1; i <= len;i++)
+    {
+        if (isdigit(prefix[i]))
+        {
+            while (isdigit(prefix[i]))
+            {
+                store = store + ((prefix[i]-'0')*multiplier);
+                i++;    
+                multiplier *= 10;
+            }
+            node = malloc(sizeof(BTNode));
+            node->item = store;
+            node->left = NULL;
+            node->right = NULL;
+            push(&s, node);
+            store = 0; // reset for next digits
+            multiplier=1;
+        }
+
+        else if (prefix[i]==' ') continue;
+    
+        else 
+        {
+            node = malloc(sizeof(BTNode));
+            node->item = prefix[i];
+ 
+            // Pop left node
+            node_left = peek(s); 
+            pop(&s);      
+            
+            // pop right node
+            node_right = peek(s);
+            pop(&s);
+ 
+            //  make them children
+            node->left = node_left;
+            node->right = node_right;
+ 
+            // put it back into the stack
+            push(&s, node);
+        }
     }
-	*root = peek(*p); //Point to top of stack after finishing for loop
+    node= peek(s);
+    pop(&s);
+    (*root) = node;
+
 }
 
 void printTree(BTNode *node){
     //Write your code here
-    // print left rootrigh
-   if (node == NULL) { 
-        return; 
-    } 
-    else { 
-        printTree(node->left); 
+    // print left rootright
+    if (node == NULL) return;
+    printTree(node->left); 
         
-        if (node->left==NULL && node->right==NULL) {
+    if (node->left==NULL && node->right==NULL) 
+    {
           printf("%d ", node->item);
-        }
-        else{
-          printf("%c ", node->item);
-        } 
-        printTree(node->right); 
     }
+    else
+    {
+          printf("%c ", node->item);
+    } 
+    printTree(node->right); 
 }
 
 
 void printTreePostfix(BTNode *node){
    //Write your code here
    // print in post order, left right root
-   if (node == NULL) { 
-        return; 
-    } 
-    else { 
-        printTreePostfix(node->left); 
-        printTreePostfix(node->right); 
-        if (node->left==NULL && node->right==NULL) //if digit
-        {
+    if (node == NULL) return;
+    
+    printTreePostfix(node->left); 
+    printTreePostfix(node->right); 
+    if (node->left==NULL && node->right==NULL) //if digit
+    {
           printf("%d ", node->item);
-        }
-        else {
+    }
+    else 
+    {
           printf("%c ", node->item);
-        }
-    } 
+    }
 }
 
 double computeTree(BTNode *node){
 //Write your code here
-  if (node->right == NULL && node->left == NULL){
-    return node->item;
-  }
-  double l = computeTree(node->left);
-  double r = computeTree(node->right);
+    if (node->right == NULL && node->left == NULL) return node->item;
+    double l = computeTree(node->left);
+    double r = computeTree(node->right);
 
-  if (node->item == '+') return l+r;
-  if (node->item == '-') return l-r;
-  if (node->item == '/') return l/r;
-  if (node->item == '*') return l*r;
+    if (node->item == '+') return l+r;
+    if (node->item == '-') return l-r;
+    if (node->item == '/') return l/r;
+    if (node->item == '*') return l*r;
 }
 
 void push(Stack *sPtr, BTNode *item){
